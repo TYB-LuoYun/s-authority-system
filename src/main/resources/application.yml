@@ -1,0 +1,20 @@
+server:
+  port: 3399
+
+secure:
+  ignore:
+    urls: #配置白名单路径
+    - "/user/login"
+    - "/qc/rectify/info"
+    - "/file/getFile"
+    - "/swagger-ui/"
+    - "/swagger-ui/**"
+    - "/webjars/**"
+    - "/swagger-resources/**"
+    - "/v2/api-docs"
+    - "/v3/api-docs"
+    - "/*.html"
+    - "/**/*.html"
+    - "/**/*.css"
+    - "/**/*.js"
+    - "/error"
