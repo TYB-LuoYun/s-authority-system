@@ -15,6 +15,8 @@ public class JwtTokenUtil {
     public static final String TOKEN_PREFIX ="Bearer" ;
     private static final long serialVersionUID = 1L;
 
+    public static final String USER_ID = "id";
+
     /**
      * 用户名称
      */
@@ -43,7 +45,7 @@ public class JwtTokenUtil {
      */
     public static String generateToken(SysUser sysUser) {
         Map<String, Object> claims = new HashMap<>(3);
-        claims.put("id", sysUser.getId());
+        claims.put(USER_ID, sysUser.getId());
         claims.put(USERNAME, sysUser.getUsername());
         claims.put(CREATED, new Date());
         claims.put(AUTHORITIES,sysUser.getAuthorities());
@@ -60,6 +62,7 @@ public class JwtTokenUtil {
         Date expirationDate = new Date(System.currentTimeMillis() + EXPIRE_TIME);
         return Jwts.builder().setClaims(claims).setExpiration(expirationDate).signWith(SignatureAlgorithm.HS512, SECRET).compact();
     }
+
 
     /**
      * 从令牌中获取用户名

@@ -1,6 +1,7 @@
 package top.anets.controller;
 
 import io.jsonwebtoken.Claims;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -8,11 +9,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import top.anets.common.constants.SysConstants;
+import top.anets.common.utils.CookieUtils;
 import top.anets.entity.SysUser;
 import top.anets.common.utils.JwtTokenUtil;
 import top.anets.common.utils.SecurityUtils;
+import top.anets.service.impl.UserDetailsServiceImpl;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import static top.anets.common.utils.JwtTokenUtil.getClaimsFromToken;
 
@@ -27,12 +33,14 @@ public class UserController {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @Autowired
+    private UserDetailsServiceImpl sysUserDetailsService;
 
-    private String REDIS_USER_PREFIX="user-uid-";
+
     
 
     @RequestMapping("/login")
-    private String login(String username, String password, HttpServletRequest request)
+    private String login(String username, String password, HttpServletRequest request, HttpServletResponse response)
     {
         Authentication authentication = SecurityUtils.login(request, username, password, authenticationManager);
 //      认证通过后就能获取到用户信息 
@@ -41,9 +49,13 @@ public class UserController {
             if (principal instanceof SysUser) {
                 SysUser userDetails = (SysUser) authentication.getPrincipal();
 //              redis存储用户信息
-                redisTemplate.opsForValue().set(REDIS_USER_PREFIX+userDetails.getId(),userDetails );
+                redisTemplate.opsForValue().set(SysConstants.REDIS_USER_PREFIX+userDetails.getId(),userDetails ,60*60*24*365);
 //              JWT通过用户的一部分字段（自己定）生成token,自定义JWT
                 String token = JwtTokenUtil.generateToken(userDetails);
+                /**
+                 * 将token传给前端
+                 */
+                CookieUtils.setCookie(request,response , SysConstants.TOKEN_SERVICE, token,60*60*24*365);
                 return token;
             }else{
                 throw new RuntimeException("验证失败");
@@ -53,12 +65,33 @@ public class UserController {
         }
     }
 
+    @RequestMapping("/logout")
+    public void logout(HttpServletRequest request, HttpServletResponse response){
+        CookieUtils.deleteCookie(request,response , SysConstants.TOKEN_SERVICE);
+        SysUser sysUser =(SysUser) SecurityUtils.getUser();
+        if(sysUser == null){
+            return;
+        }
+//      使登录session状态失效
+        HttpSession session = request.getSession();
+        if (session != null) {
+            session.invalidate();
+        }
+
+//      使用户缓存失效
+        redisTemplate.delete( SysConstants.REDIS_USER_PREFIX +sysUser.getId());
+    }
+
+
     @GetMapping("/getUser")
     private SysUser getUser(String token){
+        if(StringUtils.isBlank(token)){
+            return (SysUser) SecurityUtils.getUser();
+        }
 //      之前登录成功后存的字段都在这里面
         Claims fromToken = getClaimsFromToken(token);
-        String id = (String) fromToken.get("id");
-        return (SysUser) redisTemplate.opsForValue().get(REDIS_USER_PREFIX+id);
+        String id = (String) fromToken.get(JwtTokenUtil.USER_ID);
+        return (SysUser) redisTemplate.opsForValue().get(SysConstants.REDIS_USER_PREFIX+id);
     }
 
 

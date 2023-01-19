@@ -1,4 +1,4 @@
-package top.anets.common.support;
+package top.anets.common.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

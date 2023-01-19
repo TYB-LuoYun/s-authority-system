@@ -1,4 +1,4 @@
-package top.anets.common.support;
+package top.anets.common.utils;
 
 import com.alibaba.fastjson.JSON;
 import lombok.AllArgsConstructor;

@@ -51,9 +51,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                // 添加JWT鉴权拦截器
 //                .addFilter(new JWTAuthorizationFilter(authenticationManager()))
 
-                .sessionManagement()
+                .sessionManagement();
                 // 设置Session的创建策略为：Spring Security永不创建HttpSession 不使用HttpSession来获取SecurityContext ,不创建Session, 使用jwt来管理用户的登录状态
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) ;
+//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) ;
 
 
 
