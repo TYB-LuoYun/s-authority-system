@@ -1,5 +1,5 @@
 server:
-  port: 3399
+  port: 3398
 
 
 spring:
@@ -12,7 +12,7 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
   redis:
-    database: 1
+    database: 5
     host: 127.0.0.1
     port: 6379
     password:
@@ -31,12 +31,12 @@ spring:
     password: tyb
 
 mybatis-plus:
-  type-aliases-package: top.anets.modules.**.entity
+  type-aliases-package: top.anets.module.**.entity
   # xxxMapper.xml 路径
-  mapper-locations: classpath*:top/anets/modules/**/mapper/**/*.xml
+  mapper-locations: classpath*:top/anets/module/**/mapper/**/*.xml
 
 file:
-  ROOT_PATH: C:\Users\Administrator\Desktop\temp\imgs
+  ROOT_PATH: ${user.home}/.files
 
 
 secure:

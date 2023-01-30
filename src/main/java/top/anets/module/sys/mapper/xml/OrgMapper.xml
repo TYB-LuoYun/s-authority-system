@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.anets.module.sys.mapper.OrgMapper">
+
+        <!-- 通用查询映射结果 -->
+        <!--  <resultMap id="BaseResultMap" type="Org">
+                    <id column="id" property="id"/>
+                    <result column="type" property="type"/>
+                    <result column="name" property="name"/>
+                    <result column="code" property="code"/>
+                    <result column="description" property="description"/>
+                    <result column="introduction" property="introduction"/>
+                    <result column="web_site" property="webSite"/>
+                    <result column="logo_image" property="logoImage"/>
+                    <result column="address" property="address"/>
+                    <result column="phone" property="phone"/>
+                    <result column="email" property="email"/>
+                    <result column="parent_id" property="parentId"/>
+                    <result column="level" property="level"/>
+                    <result column="update_time" property="updateTime"/>
+                    <result column="delete_flag" property="deleteFlag"/>
+        </resultMap> -->
+
+        <!-- 通用查询结果列 -->
+       <!-- <sql id="Base_Column_List">
+            id, type, name, code, description, introduction, web_site, logo_image, address, phone, email, parent_id, level, update_time, delete_flag
+        </sql>-->
+
+
+
+
+
+
+
+
+</mapper>

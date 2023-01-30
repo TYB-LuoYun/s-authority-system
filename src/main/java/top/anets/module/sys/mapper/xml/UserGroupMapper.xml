@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.anets.module.sys.mapper.UserGroupMapper">
+
+        <!-- 通用查询映射结果 -->
+        <!--  <resultMap id="BaseResultMap" type="UserGroup">
+                    <id column="id" property="id"/>
+                    <result column="org_id" property="orgId"/>
+                    <result column="dept_id" property="deptId"/>
+                    <result column="name" property="name"/>
+                    <result column="code" property="code"/>
+                    <result column="authorize_type" property="authorizeType"/>
+                    <result column="update_time" property="updateTime"/>
+                    <result column="delete_flag" property="deleteFlag"/>
+        </resultMap> -->
+
+        <!-- 通用查询结果列 -->
+       <!-- <sql id="Base_Column_List">
+            id, org_id, dept_id, name, code, authorize_type, update_time, delete_flag
+        </sql>-->
+
+
+
+
+
+
+
+
+</mapper>

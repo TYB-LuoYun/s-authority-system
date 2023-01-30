@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.anets.module.sys.mapper.DictParamMapper">
+
+        <!-- 通用查询映射结果 -->
+        <!--  <resultMap id="BaseResultMap" type="DictParam">
+                    <id column="id" property="id"/>
+                    <result column="group_code" property="groupCode"/>
+                    <result column="type_code" property="typeCode"/>
+                    <result column="name" property="name"/>
+                    <result column="code" property="code"/>
+                    <result column="description" property="description"/>
+                    <result column="value" property="value"/>
+                    <result column="value_type" property="valueType"/>
+                    <result column="options" property="options"/>
+                    <result column="sort" property="sort"/>
+                    <result column="insets_url" property="insetsUrl"/>
+                    <result column="img_url" property="imgUrl"/>
+                    <result column="link_url" property="linkUrl"/>
+                    <result column="update_time" property="updateTime"/>
+                    <result column="root_id" property="rootId"/>
+                    <result column="parent_id" property="parentId"/>
+                    <result column="is_dir" property="isDir"/>
+                    <result column="is_leaf" property="isLeaf"/>
+                    <result column="state" property="state"/>
+                    <result column="level" property="level"/>
+                    <result column="deleted" property="deleted"/>
+                    <result column="attr1" property="attr1"/>
+                    <result column="attr2" property="attr2"/>
+                    <result column="attr3" property="attr3"/>
+                    <result column="attr4" property="attr4"/>
+                    <result column="attr5" property="attr5"/>
+        </resultMap> -->
+
+        <!-- 通用查询结果列 -->
+       <!-- <sql id="Base_Column_List">
+            id, group_code, type_code, name, code, description, value, value_type, options, sort, insets_url, img_url, link_url, update_time, root_id, parent_id, is_dir, is_leaf, state, level, deleted, attr1, attr2, attr3, attr4, attr5
+        </sql>-->
+
+
+
+
+
+
+
+
+</mapper>

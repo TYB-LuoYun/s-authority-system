@@ -3,7 +3,7 @@ package top.anets.common.utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import top.anets.entity.SysUser;
+import top.anets.module.sys.entity.SysUser;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;

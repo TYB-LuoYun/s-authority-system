@@ -1,4 +1,4 @@
-package top.anets.controller;
+package top.anets.module.sys.controller;
 
 import io.jsonwebtoken.Claims;
 import org.apache.commons.lang3.StringUtils;
@@ -11,10 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.anets.common.constants.SysConstants;
 import top.anets.common.utils.CookieUtils;
-import top.anets.entity.SysUser;
+import top.anets.common.utils.Result;
+import top.anets.module.sys.entity.SysUser;
 import top.anets.common.utils.JwtTokenUtil;
 import top.anets.common.utils.SecurityUtils;
-import top.anets.service.impl.UserDetailsServiceImpl;
+import top.anets.module.security.UserDetailsServiceImpl;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -68,11 +69,11 @@ public class UserController {
     }
 
     @RequestMapping("/logout")
-    public void logout(HttpServletRequest request, HttpServletResponse response){
+    public Result logout(HttpServletRequest request, HttpServletResponse response){
         CookieUtils.deleteCookie(request,response , SysConstants.TOKEN_SERVICE);
         SysUser sysUser =(SysUser) SecurityUtils.getUser();
         if(sysUser == null){
-            return;
+            return Result.success();
         }
 //      使登录session状态失效
         HttpSession session = request.getSession();
@@ -82,6 +83,7 @@ public class UserController {
 
 //      使用户缓存失效
         redisTemplate.delete( SysConstants.REDIS_USER_PREFIX +sysUser.getId());
+        return Result.success();
     }
 
 

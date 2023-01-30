@@ -1,4 +1,4 @@
-package top.anets.service.impl;
+package top.anets.module.security;
 
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
@@ -13,8 +13,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import top.anets.common.constants.SysConstants;
 import top.anets.common.utils.CookieUtils;
-import top.anets.entity.SysRole;
-import top.anets.entity.SysUser;
+import top.anets.exception.ServiceException;
+import top.anets.module.sys.entity.Permission;
+import top.anets.module.sys.entity.SysUser;
+import top.anets.module.sys.service.IUserRoleGroupService;
+import top.anets.module.sys.service.IUserService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -30,35 +33,38 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @Autowired
+    private IUserService userService;
+
+
+    @Autowired
+    private IUserRoleGroupService userRoleGroupService;
+
     @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        if (s == null || "".equals(s))
+    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+        if (userName == null || "".equals(userName))
         {
-            throw new RuntimeException("用户不能为空");
+            throw new ServiceException("用户不能为空");
         }
         // 调用方法查询用户
-
-        Set<GrantedAuthority> authorities = Sets.newHashSet();
-        ArrayList<SysRole> sysRoles = new ArrayList<>();
-        SysRole sysRole1 = new SysRole();
-        sysRole1.setName("admin");
-        sysRoles.add(sysRole1);
-//        for (SysRole sysRole : sysRoles)
-//        {
-//            authorities.add(new MyGrantedAuthority("ROLE_"+ sysRole.getName()));
-//        }
-
-
-        SysUser sysUser = new SysUser("admin", passwordEncoder.encode("123456"),null,authorities);
-        sysUser.setId("1");
+        SysUser sysUser = userService.getUser(userName);
+        if(sysUser == null){
+            throw new ServiceException("用户不存在");
+        }
+//      查找用户角色
+        List<String> authorities = userRoleGroupService.getAuthorities(sysUser.getId());
+        Set<MyGrantedAuthority> grantedAuthoritys = Sets.newHashSet();
+        if(authorities != null){
+            authorities.forEach(item->{
+                grantedAuthoritys.add( new MyGrantedAuthority( item));
+            });
+        }
+        sysUser.setAuthorities(grantedAuthoritys);
         return sysUser;
     }
 
     public UserDetails initUser(String userId) {
-        Set<GrantedAuthority> authorities = Sets.newHashSet();
-//        这里去查库
-        SysUser  byId =new SysUser("admin", passwordEncoder.encode("123456"),null,authorities );
-        byId.setId("1");
+        SysUser byId = userService.getById(userId);
         return loadUserByUsername(byId.getUsername());
     }
 
@@ -71,4 +77,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         token = request.getHeader(SysConstants.TOKEN_HEADER);
         return token;
     }
+
+
 }

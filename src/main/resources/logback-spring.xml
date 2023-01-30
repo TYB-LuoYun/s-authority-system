@@ -233,7 +233,7 @@
     <logger name="com.xxl.job.core.util" level="OFF" />
 
     <!-- 单独输出-->
-    <logger name="top.anets.modules" level="DEBUG" >
+    <logger name="top.anets.module" level="DEBUG" >
         <appender-ref ref="console"/>
     </logger>
 

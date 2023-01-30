@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.anets.module.sys.mapper.UserRoleGroupMapper">
+
+        <!-- 通用查询映射结果 -->
+        <!--  <resultMap id="BaseResultMap" type="UserRoleGroup">
+                    <id column="id" property="id"/>
+                    <result column="user_id" property="userId"/>
+                    <result column="type" property="type"/>
+                    <result column="role_id" property="roleId"/>
+                    <result column="group_id" property="groupId"/>
+        </resultMap> -->
+
+        <!-- 通用查询结果列 -->
+       <!-- <sql id="Base_Column_List">
+            id, user_id, type, role_id, group_id
+        </sql>-->
+     <select id="getAuthorities" resultType="java.lang.String">
+             <if test="!roles.isEmpty()">
+                     select r.code  as code   from s_role r   where   r.id
+                     in (<foreach collection="roles" item="e" separator=",">#{e}</foreach>)
+             </if>
+             <if test="!roles.isEmpty() and !groups.isEmpty()">
+              union
+             </if>
+             <if test="!groups.isEmpty()">
+                     select concat('group_',u.code)  as code   from s_user_group u where u.id in (<foreach collection="groups" item="e" separator=",">#{e}</foreach>)
+                     union
+                     select r.code  from s_permission_relation p  left join s_role r on r.id = p.role_id where p.relation_type  = 2  and p.group_id in (<foreach collection="groups" item="e" separator=",">#{e}</foreach>)
+             </if>
+      </select>
+
+
+
+
+
+
+
+</mapper>

@@ -32,7 +32,7 @@ public class LogAop {
      **/
 
     //这样就可以在切面的同时排除指定的一些接口(不要直接两个表达式拼在一起)
-    @Pointcut("execution(public * top.anets.controller..*.*(..))")
+    @Pointcut("execution(public * top.anets.module.*.controller..*.*(..))")
     public void log() {
 
     }

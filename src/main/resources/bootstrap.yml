@@ -28,7 +28,7 @@ management:
 
 
 #日志
-#logging:
-#  config: classpath:logback-spring.xml
-#  file:
-#    path: ${user.home}/.auth/logs/${spring.application.name}/
+logging:
+  config: classpath:logback-spring.xml
+  file:
+    path: ${user.home}/.auth/logs/${spring.application.name}/
