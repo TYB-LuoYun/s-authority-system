@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: s-authority-system # 当前服务的应用名，与nacos中的dataid的前缀匹配
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848 # 注册中心地址  nacos server
+        enabled: false
+      config:
+        server-addr: 127.0.0.1:8848 # 配置中心地址 nacos server
+        file-extension: yml # 配置中心的配置后缀
+        #        启动或者关闭nacos
+        enabled: false
+        group: DEFAULT_GROUP
+  profiles:
+    active: dev # 指定环境为开发环境，即读取 system-server-dev.yml
+  boot:
+    admin:
+      client:
+        url: http://127.0.0.1:9002
+
+# 暴露我们的所有监控信息
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+
+#日志
+#logging:
+#  config: classpath:logback-spring.xml
+#  file:
+#    path: ${user.home}/.auth/logs/${spring.application.name}/

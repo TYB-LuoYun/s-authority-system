@@ -20,6 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import java.util.concurrent.TimeUnit;
+
 import static top.anets.common.utils.JwtTokenUtil.getClaimsFromToken;
 
 @RestController
@@ -40,7 +42,7 @@ public class UserController {
     
 
     @RequestMapping("/login")
-    private String login(String username, String password, HttpServletRequest request, HttpServletResponse response)
+    public String login(String username, String password, HttpServletRequest request, HttpServletResponse response)
     {
         Authentication authentication = SecurityUtils.login(request, username, password, authenticationManager);
 //      认证通过后就能获取到用户信息 
@@ -49,7 +51,7 @@ public class UserController {
             if (principal instanceof SysUser) {
                 SysUser userDetails = (SysUser) authentication.getPrincipal();
 //              redis存储用户信息
-                redisTemplate.opsForValue().set(SysConstants.REDIS_USER_PREFIX+userDetails.getId(),userDetails ,60*60*24*365);
+                redisTemplate.opsForValue().set(SysConstants.REDIS_USER_PREFIX+userDetails.getId(),userDetails ,60*60*24*365, TimeUnit.SECONDS);
 //              JWT通过用户的一部分字段（自己定）生成token,自定义JWT
                 String token = JwtTokenUtil.generateToken(userDetails);
                 /**
@@ -84,7 +86,7 @@ public class UserController {
 
 
     @GetMapping("/getUser")
-    private SysUser getUser(String token){
+    public SysUser getUser(String token){
         if(StringUtils.isBlank(token)){
             return (SysUser) SecurityUtils.getUser();
         }

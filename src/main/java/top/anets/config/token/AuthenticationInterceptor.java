@@ -15,7 +15,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import top.anets.common.constants.SysConstants;
 import top.anets.common.utils.Result;
-import top.anets.common.utils.CookieUtils;
 import top.anets.common.utils.JwtTokenUtil;
 import top.anets.common.utils.SecurityUtils;
 import top.anets.entity.SysUser;
@@ -60,6 +59,11 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         if(StringUtils.isNotBlank(token)){
             Claims claimsFromToken = JwtTokenUtil.getClaimsFromToken(token);
             if(claimsFromToken == null){
+                // 白名单放行
+                boolean isMatch = this.matchWhiteListUrl(request);
+                if(isMatch){
+                    return true;
+                }
                 this.setAuthenticateFailMsg(response,"无效token");
                 return false;
             }

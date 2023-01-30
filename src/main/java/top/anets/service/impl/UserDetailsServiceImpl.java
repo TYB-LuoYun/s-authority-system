@@ -1,8 +1,10 @@
 package top.anets.service.impl;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,6 +19,7 @@ import top.anets.entity.SysUser;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -35,25 +38,26 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
         // 调用方法查询用户
 
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        Set<GrantedAuthority> authorities = Sets.newHashSet();
         ArrayList<SysRole> sysRoles = new ArrayList<>();
         SysRole sysRole1 = new SysRole();
         sysRole1.setName("admin");
         sysRoles.add(sysRole1);
-        for (SysRole sysRole : sysRoles)
-        {
-            authorities.add(new SimpleGrantedAuthority("ROLE_"+ sysRole.getName()));
-        }
+//        for (SysRole sysRole : sysRoles)
+//        {
+//            authorities.add(new MyGrantedAuthority("ROLE_"+ sysRole.getName()));
+//        }
 
 
-        SysUser sysUser = new SysUser("admin", passwordEncoder.encode("123456"), null, authorities);
+        SysUser sysUser = new SysUser("admin", passwordEncoder.encode("123456"),null,authorities);
         sysUser.setId("1");
         return sysUser;
     }
 
     public UserDetails initUser(String userId) {
+        Set<GrantedAuthority> authorities = Sets.newHashSet();
 //        这里去查库
-        SysUser  byId =new SysUser("admin", passwordEncoder.encode("123456"),null,null);
+        SysUser  byId =new SysUser("admin", passwordEncoder.encode("123456"),null,authorities );
         byId.setId("1");
         return loadUserByUsername(byId.getUsername());
     }

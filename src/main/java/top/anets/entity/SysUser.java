@@ -1,12 +1,18 @@
 package top.anets.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
 @Data
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+//@JsonIgnoreProperties解决反序列化报错
 public class SysUser implements UserDetails   {
     private static final long serialVersionUID = 1L;
     private String id;
@@ -20,6 +26,10 @@ public class SysUser implements UserDetails   {
         this.salt = salt;
         this.authorities = authorities;
     }
+
+
+
+
 
     @Override
     public String getUsername() {

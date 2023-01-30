@@ -8,7 +8,7 @@ package top.anets.common.constants;
 public final class SysConstants {
 
     public static final String TOKEN_SERVICE = "token-service";
-    public static final String REDIS_USER_PREFIX = "user-uid-";
+    public static final String REDIS_USER_PREFIX = "user-cache-id-";
     public static final String TOKEN_HEADER = "token";
 
     private SysConstants() {
