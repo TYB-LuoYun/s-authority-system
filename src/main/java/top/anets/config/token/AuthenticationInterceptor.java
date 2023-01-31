@@ -26,8 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -127,18 +126,55 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             this.setAuthenticateFailMsg(response,"该用户未设置权限!");
             return false;
         }
+//      细粒度
         List<String> needAuthorities = (List<String>) redisTemplate.opsForHash().get(RedisConstant.RESOURCE_ROLES_MAP, uri);
         if(needAuthorities == null){
-//          该资源不需要权限
-            return true;
+            //      粗粒度 - 查看是否有该模块的权限 , 如果url是 /system/order/pay 但是缓存路径是 /system/** , 针对这种情况
+            Map<String, List<String>> moduleRes = redisTemplate.opsForHash().entries(RedisConstant.MODULE_RESOURCE_ROLES_MAP);
+            if(moduleRes == null){
+                this.setAuthenticateFailMsg(response,"没有权限访问");
+                return false;
+            }
+            Set<String> keys = moduleRes.keySet();
+            if(keys == null){
+                this.setAuthenticateFailMsg(response,"没有权限访问");
+                return false;
+            }
+            PathMatcher pathMatcher = new AntPathMatcher();
+            for(String key : keys){
+                if(pathMatcher.match(key, uri)){
+                    needAuthorities =  moduleRes.get(key);
+                    break;
+                }
+            }
         }
-        for (GrantedAuthority item :authorities) {
-            if(needAuthorities.contains(item.getAuthority())){
-                return true;
+
+        if(needAuthorities != null){
+            for (GrantedAuthority item :authorities) {
+                if(needAuthorities.contains(item.getAuthority())){
+                    return true;
+                }
             }
         }
         this.setAuthenticateFailMsg(response,"没有权限访问");
         return false;
+    }
+
+    public static void main(String[] args){
+
+        List<String> strings = new ArrayList<>();
+        for(int i=0; i<1000;i++){
+            strings.add("/"+i+"/system/**");
+        }
+        long start = System.currentTimeMillis();
+        PathMatcher pathMatcher = new AntPathMatcher();
+        for(String item : strings){
+            System.out.println( pathMatcher.match(item, "/9999/system/get"));
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("结束");
+        System.out.println((end-start)*1.0/1000 +"s");
+
     }
 
     private boolean matchWhiteListUrl(HttpServletRequest request) {
@@ -154,6 +190,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         }
         return false;
     }
+
 
     private void setAuthenticateFailMsg(HttpServletResponse response, String msg) throws IOException {
         response.setContentType(SysConstants.APPLICATION_JSON_UTF8);

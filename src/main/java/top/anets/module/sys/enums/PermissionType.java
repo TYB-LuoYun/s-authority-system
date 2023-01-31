@@ -5,14 +5,16 @@ import lombok.Getter;
 
 /**
  * @author ftm
- * @date 2023/1/30 0030 15:31
+ * @date 2023/1/31 0031 11:25
  */
 @Getter
 @AllArgsConstructor
-public enum PemissionRelationType {
-    USER_GROUP_PERMISSION("用户组-权限",0),
-    ROLE_PERMISSION("角色-权限",1),
-    USER_GROUP_ROLE("用户组-角色",2),
+public enum PermissionType {
+    SYSTEM("系统",0),
+    MENU("菜单",1),
+    MODULE("模块",2),
+    BUTTOM("按钮",3),
+    FUNCTION("功能",4),
     ;
 
     private String name;

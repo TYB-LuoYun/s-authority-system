@@ -19,5 +19,5 @@ public interface IPermissionService extends IService<Permission> {
      * 查询某资源对应所需要的角色或者组
      * @return
      */
-    List<ResourceRoles> loadResourceRoles();
+    List<ResourceRoles> loadResourceRoles(List<Integer> types);
 }

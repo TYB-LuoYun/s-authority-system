@@ -4,10 +4,11 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
+import top.anets.exception.ServiceException;
 import top.anets.module.sys.entity.Permission;
 import top.anets.module.sys.entity.PermissionRelation;
-import top.anets.module.sys.enums.PemissionRelationType;
-import top.anets.module.sys.enums.UserRoleGroupType;
+import top.anets.module.sys.enums.PermissionRelationType;
+import top.anets.module.sys.enums.PermissionType;
 import top.anets.module.sys.mapper.PermissionMapper;
 import top.anets.module.sys.mapper.UserRoleGroupMapper;
 import top.anets.module.sys.model.ResourceRoles;
@@ -35,9 +36,10 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     private IPermissionRelationService permissionRelationService;
     @Autowired
     private UserRoleGroupMapper userRoleGroupMapper;
+
     @Override
-    public List<ResourceRoles> loadResourceRoles() {
-        List<Permission> list = this.list();
+    public List<ResourceRoles> loadResourceRoles(List<Integer> types) {
+        List<Permission> list = this.list(Wrappers.<Permission>lambdaQuery().in(Permission::getType, types).isNotNull(Permission::getUrl));
         if(CollectionUtils.isEmpty(list)){
             return null;
         }
@@ -55,10 +57,10 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
                 List<String> roles = new ArrayList<>();
                 List<String> groups = new ArrayList<>();
                 list1.forEach(each->{
-                    if(PemissionRelationType.ROLE_PERMISSION.getValue() == each.getRelationType() &&  StringUtils.isNotBlank(each.getRoleId())){
+                    if(PermissionRelationType.ROLE_PERMISSION.getValue() == each.getRelationType() &&  StringUtils.isNotBlank(each.getRoleId())){
                         roles.add(each.getRoleId());
                     }
-                    if(PemissionRelationType.USER_GROUP_PERMISSION.getValue() == each.getRelationType()&&  StringUtils.isNotBlank(each.getGroupId())){
+                    if(PermissionRelationType.USER_GROUP_PERMISSION.getValue() == each.getRelationType()&&  StringUtils.isNotBlank(each.getGroupId())){
                         groups.add(each.getGroupId());
                     }
                 });

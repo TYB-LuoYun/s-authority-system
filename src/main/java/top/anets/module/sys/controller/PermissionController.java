@@ -8,6 +8,7 @@ import top.anets.common.constants.RedisConstant;
 import top.anets.module.base.BaseController;
 import top.anets.module.base.PageQuery;
 import top.anets.module.base.WrapperQuery;
+import top.anets.module.sys.enums.PermissionType;
 import top.anets.module.sys.model.ResourceRoles;
 import top.anets.module.sys.service.IPermissionService;
 import top.anets.module.sys.entity.Permission;
@@ -22,6 +23,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -72,16 +74,28 @@ public class PermissionController  extends BaseController<Permission> {
     public void loadResourceRoles(){
         log.info("加载角色资源开始=====");
         Map<String, List<String>> resourceRolesMap = new TreeMap<>();
-        List<ResourceRoles> res = permissionService.loadResourceRoles();
-        if(CollectionUtils.isEmpty(res)){
-            return;
+        Map<String, List<String>> moduleResourceRolesMap = new TreeMap<>();
+        List<ResourceRoles> res = permissionService.loadResourceRoles(Arrays.asList(PermissionType.MENU.getValue(),PermissionType.BUTTOM.getValue(),PermissionType.FUNCTION.getValue()));
+        if(!CollectionUtils.isEmpty(res)){
+            res.forEach(item->{
+                resourceRolesMap.put(item.getResource(), item.getRoles());
+            });
+
+            redisTemplate.delete(RedisConstant.RESOURCE_ROLES_MAP);
+            redisTemplate.opsForHash().putAll(RedisConstant.RESOURCE_ROLES_MAP, resourceRolesMap);
         }
-        res.forEach(item->{
-            resourceRolesMap.put(item.getResource(), item.getRoles());
-        });
+        List<ResourceRoles> moduleRes = permissionService.loadResourceRoles(Arrays.asList(PermissionType.MODULE.getValue()));
+        if(!CollectionUtils.isEmpty(moduleRes)){
+            moduleRes.forEach(item->{
+                moduleResourceRolesMap.put(item.getResource(), item.getRoles());
+            });
+            redisTemplate.delete(RedisConstant.MODULE_RESOURCE_ROLES_MAP);
+            redisTemplate.opsForHash().putAll(RedisConstant.MODULE_RESOURCE_ROLES_MAP, moduleResourceRolesMap);
+        }
 
 
-        redisTemplate.opsForHash().putAll(RedisConstant.RESOURCE_ROLES_MAP, resourceRolesMap);
+
+
         log.info("加载角色资源结束=====");
     }
 
