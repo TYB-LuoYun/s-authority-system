@@ -4,12 +4,14 @@
 package top.anets.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import top.anets.common.utils.Result;
 
@@ -21,6 +23,7 @@ import java.io.StringWriter;
  *
  */
 @RestControllerAdvice
+@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 @Slf4j
 public class GlobalExceptionHandler {
 //	未知异常

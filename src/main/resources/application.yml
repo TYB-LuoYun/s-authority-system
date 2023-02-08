@@ -56,4 +56,6 @@ secure:
     - "/**/*.css"
     - "/**/*.js"
     - "/error"
+# 集成微服务的时候需要关掉安全拦截
+  enable: false
 

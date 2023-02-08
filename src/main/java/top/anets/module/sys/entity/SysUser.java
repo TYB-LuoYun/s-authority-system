@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
@@ -100,6 +101,8 @@ public class SysUser implements UserDetails {
 
     @TableField(exist = false)
     private Collection<? extends GrantedAuthority> authorities;
+    @TableField(exist = false)
+    private List<String> roles;
 
 
     public SysUser(String username, String password, String salt, Collection<? extends GrantedAuthority> authorities) {
@@ -137,4 +140,5 @@ public class SysUser implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }

@@ -16,6 +16,7 @@ import top.anets.module.sys.entity.SysUser;
 import top.anets.common.utils.JwtTokenUtil;
 import top.anets.common.utils.SecurityUtils;
 import top.anets.module.security.UserDetailsServiceImpl;
+import top.anets.module.sys.service.IUserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,6 +39,10 @@ public class UserController {
 
     @Autowired
     private UserDetailsServiceImpl sysUserDetailsService;
+
+
+    @Autowired
+    private IUserService userService;
 
 
     
@@ -97,9 +102,4 @@ public class UserController {
         String id = (String) fromToken.get(JwtTokenUtil.USER_ID);
         return (SysUser) redisTemplate.opsForValue().get(SysConstants.REDIS_USER_PREFIX+id);
     }
-
-
-
-
-
 }

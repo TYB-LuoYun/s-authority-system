@@ -18,4 +18,5 @@ public interface IUserService extends IService<SysUser> {
 
     SysUser getUser(String userName);
 
+    SysUser loadUserByUsername(String username);
 }

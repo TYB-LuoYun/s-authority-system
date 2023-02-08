@@ -37,30 +37,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private IUserService userService;
 
 
-    @Autowired
-    private IUserRoleGroupService userRoleGroupService;
+
 
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        if (userName == null || "".equals(userName))
-        {
-            throw new ServiceException("用户不能为空");
-        }
-        // 调用方法查询用户
-        SysUser sysUser = userService.getUser(userName);
-        if(sysUser == null){
-            throw new ServiceException("用户不存在");
-        }
-//      查找用户角色
-        List<String> authorities = userRoleGroupService.getAuthorities(sysUser.getId());
-        Set<MyGrantedAuthority> grantedAuthoritys = Sets.newHashSet();
-        if(authorities != null){
-            authorities.forEach(item->{
-                grantedAuthoritys.add( new MyGrantedAuthority( item));
-            });
-        }
-        sysUser.setAuthorities(grantedAuthoritys);
-        return sysUser;
+        return userService.loadUserByUsername(userName);
     }
 
     public UserDetails initUser(String userId) {

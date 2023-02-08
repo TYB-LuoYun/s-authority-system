@@ -15,7 +15,7 @@ import top.anets.common.utils.Result;
  */
 @RestControllerAdvice(basePackages = "top.anets")
 public class JsonResponseBodyAdvice implements ResponseBodyAdvice<Object> {
-
+    private static final String FEIGN_REQUEST_ID = "FEIGN_REQUEST_ID";
 
     @Override
     public boolean supports(MethodParameter methodParameter, Class<? extends HttpMessageConverter<?>> aClass) {
@@ -36,6 +36,12 @@ public class JsonResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 //            }
 //        }
 
+
+        //Feign请求时通过拦截器设置请求头，如果是Feign请求则直接返回实体对象
+        boolean isFeign = serverHttpRequest.getHeaders().containsKey(FEIGN_REQUEST_ID);
+        if(isFeign){
+            return o;
+        }
 
         if (o instanceof Result) {
             return o;

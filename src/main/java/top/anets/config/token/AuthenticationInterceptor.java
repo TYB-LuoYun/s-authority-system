@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,7 +41,10 @@ import java.util.*;
  * @see
  * @since JDK 1.8
  */
+@RefreshScope
 public class AuthenticationInterceptor implements HandlerInterceptor {
+    @Value("${secure.enable:true}")
+    private boolean enable;
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -56,6 +61,9 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         //进入方法之前进行的操作
+        if(!enable){
+            return true;
+        }
         // 白名单直接放行
         boolean isMatch = this.matchWhiteListUrl(request);
         if(isMatch){
@@ -126,10 +134,12 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             this.setAuthenticateFailMsg(response,"该用户未设置权限!");
             return false;
         }
+//      如果用户添加了某功能，这个功能其他人是没有权限的 ， 如果这个功能属于某模块， 但是角色已经有了模块的权限，相当于有了这个功能的权限，如果想某些角色，没有这个功能权限，需要重新授权
+//      如果某模块的功能很多，路径都没有添加，但是有模块的权限，那么第一个redis就会是无意义的请求
 //      细粒度
         List<String> needAuthorities = (List<String>) redisTemplate.opsForHash().get(RedisConstant.RESOURCE_ROLES_MAP, uri);
         if(needAuthorities == null){
-            //      粗粒度 - 查看是否有该模块的权限 , 如果url是 /system/order/pay 但是缓存路径是 /system/** , 针对这种情况
+            //粗粒度(一般)-查看是否有该模块的权限 , 如果url是 /system/order/pay 但是缓存路径是 /system/** , 针对这种情况
             Map<String, List<String>> moduleRes = redisTemplate.opsForHash().entries(RedisConstant.MODULE_RESOURCE_ROLES_MAP);
             if(moduleRes == null){
                 this.setAuthenticateFailMsg(response,"没有权限访问");
