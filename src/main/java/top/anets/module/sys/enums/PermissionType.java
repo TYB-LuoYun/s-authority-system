@@ -19,4 +19,14 @@ public enum PermissionType {
 
     private String name;
     private Integer value;
+
+
+    public static PermissionType findByValue(Integer value){
+        for (PermissionType item : PermissionType.values()){
+            if(item.getValue() == value){
+                return item;
+            }
+        }
+        return null;
+    }
 }

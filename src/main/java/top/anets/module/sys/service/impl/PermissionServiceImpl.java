@@ -2,6 +2,7 @@ package top.anets.module.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import top.anets.exception.ServiceException;
@@ -16,6 +17,7 @@ import top.anets.module.sys.service.IPermissionRelationService;
 import top.anets.module.sys.service.IPermissionService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import top.anets.module.sys.vo.PermissionVo;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -72,5 +74,32 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             }
         });
         return resourceRolesList;
+    }
+
+    @Override
+    public List<PermissionVo> resourceTree() {
+        return this.recursiveResourceTree(null);
+    }
+
+    private List<PermissionVo> recursiveResourceTree(String parentId) {
+        List<Permission> list = null;
+        if(parentId == null){
+            list = this.list(Wrappers.<Permission>lambdaQuery().isNull(Permission::getParentId).or().eq(Permission::getParentId, ""));
+        }else{
+            list = this.list(Wrappers.<Permission>lambdaQuery().eq(Permission::getParentId, parentId));
+        }
+
+        if(list == null || list.isEmpty()){
+            return null;
+        }
+        List<PermissionVo> collect = list.stream().map(e -> {
+            PermissionVo permissionVo = new PermissionVo();
+            BeanUtils.copyProperties(e, permissionVo);
+            return permissionVo;
+        }).collect(Collectors.toList());
+        collect.forEach(item->{
+            item.setChildren(this.recursiveResourceTree(item.getId()));
+        });
+        return collect;
     }
 }

@@ -51,6 +51,7 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result handleMethodArgumentNotValidException(MethodArgumentNotValidException e){
     	 /*注意：此处的BindException 是 Spring 框架抛出的Validation异常*/
     	MethodArgumentNotValidException ex = (MethodArgumentNotValidException)e;
@@ -58,8 +59,8 @@ public class GlobalExceptionHandler {
     	FieldError fieldError = ex.getBindingResult().getFieldError();
         if(fieldError!=null) log.warn("必填校验异常:{}({})", fieldError.getDefaultMessage(),fieldError.getField());
         e.printStackTrace();
-        String errorMsg = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
-        return this.error("参数校验不通过:"+errorMsg);
+//        String errorMsg = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        return this.error("参数校验不通过:"+fieldError.getField()+fieldError.getDefaultMessage());
     }
 
 

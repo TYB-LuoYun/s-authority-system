@@ -14,19 +14,23 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import top.anets.common.constants.RedisConstant;
 import top.anets.common.constants.SysConstants;
+import top.anets.common.enums.PassToken;
 import top.anets.common.utils.Result;
 import top.anets.common.utils.JwtTokenUtil;
 import top.anets.common.utils.SecurityUtils;
+import top.anets.init.LuaScriptInitializer;
 import top.anets.module.sys.entity.SysUser;
 import top.anets.module.security.UserDetailsServiceImpl;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.*;
 
@@ -69,6 +73,20 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         if(isMatch){
             return true;
         }
+
+        // 方法局部放行
+        if(handler instanceof HandlerMethod){
+            HandlerMethod handlerMethod = (HandlerMethod) handler;
+            Method method = handlerMethod.getMethod();
+            PassToken passToken = method.getAnnotation(PassToken.class);
+            if(passToken == null){
+                passToken = handlerMethod.getBeanType().getAnnotation(PassToken.class);
+            }
+            if(passToken != null&&passToken.required()){
+                return true;
+            }
+        }
+
         //获取token
         //如果不是映射到方法直接通过
         String token = sysUserDetailsService.getToken(request);
@@ -122,11 +140,13 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
      * @param user
      * @return
      */
+    @Autowired
+    private LuaScriptInitializer luaScriptInitializer;
     private boolean validationAuthority(HttpServletRequest request,HttpServletResponse response, SysUser user) throws IOException {
 //        管理员直接放行
-        if("admin".equals(user.getUsername())){
-            return true;
-        }
+//        if("admin".equals(user.getUsername())){
+//            return true;
+//        }
 //        根据路径查看访问该路径所需要的角色有哪些,比如['ADMIN']
         String uri = request.getRequestURI();
         Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
@@ -137,28 +157,29 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 //      如果用户添加了某功能，这个功能其他人是没有权限的 ， 如果这个功能属于某模块， 但是角色已经有了模块的权限，相当于有了这个功能的权限，如果想某些角色，没有这个功能权限，需要重新授权
 //      如果某模块的功能很多，路径都没有添加，但是有模块的权限，那么第一个redis就会是无意义的请求
 //      细粒度
-        List<String> needAuthorities = (List<String>) redisTemplate.opsForHash().get(RedisConstant.RESOURCE_ROLES_MAP, uri);
-        if(needAuthorities == null){
-            //粗粒度(一般)-查看是否有该模块的权限 , 如果url是 /system/order/pay 但是缓存路径是 /system/** , 针对这种情况
-            Map<String, List<String>> moduleRes = redisTemplate.opsForHash().entries(RedisConstant.MODULE_RESOURCE_ROLES_MAP);
-            if(moduleRes == null){
-                this.setAuthenticateFailMsg(response,"没有权限访问");
-                return false;
-            }
-            Set<String> keys = moduleRes.keySet();
-            if(keys == null){
-                this.setAuthenticateFailMsg(response,"没有权限访问");
-                return false;
-            }
-            PathMatcher pathMatcher = new AntPathMatcher();
-            for(String key : keys){
-                if(pathMatcher.match(key, uri)){
-                    needAuthorities =  moduleRes.get(key);
-                    break;
-                }
-            }
-        }
-
+//        List<String> needAuthorities = (List<String>) redisTemplate.opsForHash().get(RedisConstant.RESOURCE_ROLES_MAP, uri);
+//        if(needAuthorities == null){
+//            //粗粒度(一般)-查看是否有该模块的权限 , 如果url是 /system/order/pay 但是缓存路径是 /system/** , 针对这种情况
+//            Map<String, List<String>> moduleRes = redisTemplate.opsForHash().entries(RedisConstant.MODULE_RESOURCE_ROLES_MAP);
+//            if(moduleRes == null){
+//                this.setAuthenticateFailMsg(response,"没有权限访问");
+//                return false;
+//            }
+//            Set<String> keys = moduleRes.keySet();
+//            if(keys == null){
+//                this.setAuthenticateFailMsg(response,"没有权限访问");
+//                return false;
+//            }
+//            PathMatcher pathMatcher = new AntPathMatcher();
+//            for(String key : keys){
+//                if(pathMatcher.match(key, uri)){
+//                    needAuthorities =  moduleRes.get(key);
+//                    break;
+//                }
+//            }
+//        }
+//      经过测试，上面的代码用下面的代码替换，通过lua脚本减少redis连接为一次，除了第一次(执行脚本生成sha)，之后的性能都优于上面的代码
+        List<String>  needAuthorities =luaScriptInitializer.getRoleForPath(uri);
         if(needAuthorities != null){
             for (GrantedAuthority item :authorities) {
                 if(needAuthorities.contains(item.getAuthority())){

@@ -32,7 +32,7 @@ public class Permission implements Serializable {
     private String id;
 
     @ApiModelProperty(value = "类型(0,系统,1菜单,2模块,3按钮,4功能)")
-    private Boolean type;
+    private Integer type;
 
     @ApiModelProperty(value = "名称")
     private String name;

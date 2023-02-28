@@ -3,6 +3,7 @@ package top.anets.module.sys.service;
 import top.anets.module.sys.entity.Permission;
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.anets.module.sys.model.ResourceRoles;
+import top.anets.module.sys.vo.PermissionVo;
 
 import java.util.List;
 
@@ -20,4 +21,6 @@ public interface IPermissionService extends IService<Permission> {
      * @return
      */
     List<ResourceRoles> loadResourceRoles(List<Integer> types);
+
+    List<PermissionVo> resourceTree();
 }

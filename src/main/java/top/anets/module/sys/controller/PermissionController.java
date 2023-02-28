@@ -5,6 +5,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import top.anets.common.constants.RedisConstant;
+import top.anets.exception.ServiceException;
 import top.anets.module.base.BaseController;
 import top.anets.module.base.PageQuery;
 import top.anets.module.base.WrapperQuery;
@@ -21,6 +22,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.validation.Valid;
+
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
@@ -100,9 +103,30 @@ public class PermissionController  extends BaseController<Permission> {
     }
 
 
+    /**
+     * 添加或者修改资源
+     */
+    @RequestMapping("saveOrUpdateResource")
+    public String saveOrUpdateResource(@Valid @RequestBody PermissionVo permissionVo){
+//       校验
+        PermissionType byValue = PermissionType.findByValue(permissionVo.getType());
+        if(byValue == null){
+            throw new ServiceException("资源类型不匹配");
+        }
+        permissionService.saveOrUpdate(permissionVo);
+        return permissionVo.getId();
+    }
 
 
-
+    /**
+     * 查看资源树（所有）
+     * 查看页面权限（系统-菜单） ---->只能添加菜单和按钮
+     * 查看功能权限（系统-目录（菜单，模块）-(功能/按钮(按钮)）） ----->只能添加模块和功能
+     */
+    @RequestMapping("resourceTree")
+    public List<PermissionVo> resourceTree(){
+        return permissionService.resourceTree();
+    }
 
 
 }
